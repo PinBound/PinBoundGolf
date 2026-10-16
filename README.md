@@ -17,9 +17,25 @@ Scores show both total strokes and relative-to-par score; fewer strokes ranks hi
 
 ## Project status
 
-Design and repository preparation. No playable application or build commands exist yet.
+The first playable prototype is implemented: one original Pine Barrens opening hole, seeded random single-hole practice, nine clubs, oscillating aim-lock, timed power, wind, lie effects, rollout, penalties, automatic putting, save/resume, supplied audio and a local ten-place opening-hole leaderboard. The full eight-course collection and season/daily modes are planned, not yet implemented.
 
-The first implementation milestone is one polished playable hole and the core shot/scoring loop. The course-authoring system and full collection follow after those mechanics are established.
+## Run and verify
+
+Node.js 22 or newer is required. There are no runtime or package-install dependencies.
+
+```sh
+npm run dev
+npm test
+npm run build
+```
+
+The development server prints `http://127.0.0.1:4180`. The static production output is `dist/`. Serve that directory with any static host; files use relative paths for project-subpath hosting. GitHub Actions checks tests and builds on pushes and pull requests. Deployment is not configured yet.
+
+## Controls
+
+Tap/click the map to choose an aim center. Lock the oscillating line, then stop the power meter. Space/Enter activates the shot control; arrow keys adjust aim when the course has focus; 1–9 select clubs. Drag to pan; pinch/wheel to zoom; Whole hole resets the view. Automatic putting adds one, two or three strokes according to finishing ring. Gameplay stops menu music; final review uses the supplied scorecard track.
+
+Shots are saved at strike time and restored by replaying inputs. Local records use three-letter initials; these are device-local and are not server-verified competitive scores. Browser storage/audio failures do not block play. The game requires a server for ES modules; opening `index.html` directly is unsupported.
 
 See [docs/DESIGN.md](docs/DESIGN.md) for confirmed requirements and open design decisions.
 

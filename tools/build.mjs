@@ -1,0 +1,10 @@
+import {mkdir,cp,readFile,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),out=path.join(root,'dist');
+await mkdir(out,{recursive:true});
+await cp(path.join(root,'public'),out,{recursive:true});
+await cp(path.join(root,'src'),path.join(out,'src'),{recursive:true});
+await writeFile(path.join(out,'index.html'),await readFile(path.join(root,'index.html')));
+await writeFile(path.join(out,'.nojekyll'),'');
+console.log('Built static Pinbound application in dist/');

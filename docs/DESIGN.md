@@ -39,8 +39,7 @@ Provide menu music and gameplay sound effects with separate volume controls. Pla
 
 ## Decisions needed during prototyping
 
-- Fixed versus oscillating aim; power timing and club selection.
-- Automatic putting rings versus interactive putting.
+- Implemented for the first prototype: oscillating aim-lock, timed power, nine clubs and automatic putting rings. The user's direction is to preserve Daily Holes' mechanics closely while changing the course and mode structure.
 - Course difficulty, optional assists and leaderboard separation.
 - Penalties, drop rules, stroke caps, ties and abandoned rounds.
 - Local saves versus accounts/cloud sync and shared leaderboards.
@@ -57,4 +56,4 @@ Provide menu music and gameplay sound effects with separate volume controls. Pla
 6. Season profiles, simulated opponents, standings and championship.
 7. Online verification and shared competition if selected; audio and visual polish throughout.
 
-The proposed technical direction is TypeScript with Canvas 2D for gameplay and a separate menu/UI layer. Framework, hosting and backend selection are not yet final.
+The prototype uses dependency-free JavaScript ES modules and Canvas 2D, with a pure shared engine and separate renderer, sound and browser state modules. A migration to TypeScript can follow as the course-authoring schema grows. Hosting and backend selection remain open.
