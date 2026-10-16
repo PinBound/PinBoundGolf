@@ -25,7 +25,7 @@ The current player uses HTML audio for the supplied tracks and effects. Music sw
 
 ## Course ambience
 
-Gameplay now has a separate, saved Course ambience volume control. Original synthesized filtered noise provides a soft breeze, with sparse two-note bird calls. This is temporary sound design pending supplied recordings. It fades out in menus and score review, follows mute, and suspends in hidden tabs. No extra audio files are required for this provisional layer.
+Gameplay uses the supplied recordings, replacing the synthesized breeze and birds. Breeze plays quietly on every course. Inland themes add the forest bird recording; coastal themes (Pacific Cypress, Atlantic Dunes and Crystal Bluff) add the surf recording. Layers loop independently, use the saved Course ambience slider, stop in menus/score review, and pause when the tab is hidden. MP3 loop seams have not been edited.
 
 Suggested recordings, in priority order:
 
@@ -36,4 +36,21 @@ Suggested recordings, in priority order:
 5. Ball contact on turf, sand impact, water splash and cart-path bounce.
 6. A brief soft portal shimmer, gentle draft whoosh and subtle lava bubbling.
 
-Keep animals and feature cues sparse; avoid a constant chorus. Supply ambience and individual effects separately so they can use independent levels and triggers. The current synthesized bed can then be replaced by biome-specific recordings.
+Keep animals and feature cues sparse; avoid a constant chorus. Supply ambience and individual effects separately so they can use independent levels and triggers. The supplied recordings now provide the main ambient beds. The remaining optional effects can be added as separate clips.
+
+## Supplied recording update
+
+All six new files were copied unchanged and verified against their Downloads originals by SHA-256. Browser metadata decoded every file successfully.
+
+| Original file | Application asset | Duration | Current use |
+| --- | --- | --- | --- |
+| gentle_breeze.mp3 | public/audio/gentle-breeze.mp3 | 76.584 s | Quiet looping breeze on all holes |
+| ocean_coast.mp3 | public/audio/ocean-coast.mp3 | 22.073 s | Looping surf on coastal/lakeside themes |
+| forrest_birds.mp3 | public/audio/forest-birds.mp3 | 212.976 s | Quiet looping bird bed on inland themes |
+| golf_swing_whoosh.mp3 | public/audio/swing-whoosh.mp3 | 0.366 s | Swing motion, varied slightly by club |
+| golf_swing_contact.mp3 | public/audio/swing-contact.mp3 | 0.470 s | Strike contact; quieter/faster for nonfinal automatic putts |
+| putt_and_score.mp3 | public/audio/putt-and-score.mp3 | 2.592 s | Only the final automatic putt that holes the ball |
+
+The final putt starts its combined recording once, and its visual phase lasts the clip duration. It does not stack the old ball-cup sound. A direct chip-in still uses ball-cup. Earlier automatic putts get only a subdued contact sound. The previous swing-swish file is retained as a source asset but no longer triggered. Menu and scorecard tracks are unchanged.
+
+Validation includes recorded layer selection, reuse, mute/levels, hidden-tab suspension/resume, final-putt clip selection and cancellation of delayed strike contact. The developer server now includes Content-Length so long MP3 recordings report finite durations during local testing.

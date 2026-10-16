@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{
     if(relative!=='index.html'&&!relative.startsWith('src/'))relative='public/'+relative;
     const file=path.resolve(root,relative);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
     const info=await stat(file);if(!info.isFile())throw new Error('Not file');
-    res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-cache'});res.end(await readFile(file));
+    res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-cache','Content-Length':info.size});res.end(await readFile(file));
   }catch{res.writeHead(404);res.end('Not found');}
 });
 const port=Number(process.env.PORT||4180);server.listen(port,'127.0.0.1',()=>console.log(`Pinbound: http://127.0.0.1:${port}`));
