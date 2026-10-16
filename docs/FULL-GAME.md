@@ -49,7 +49,7 @@ Click/tap to aim; lock the oscillating line; time the power meter. Choose among 
 
 ## Validation
 
-`npm test` currently passes 28 tests, including all 117 complete cap-score proof replays, normal approach scoring, a zero-putt eagle, full season win/loss paths, seeded AI, profile isolation, backup merge/resume, all practice selections and daily date/par rules. `npm run build` creates a static site. CI runs those checks; a manually triggered Pages workflow is prepared, but public hosting requires authorization and is not enabled.
+`npm test` currently passes 28 tests, including all 117 complete cap-score proof replays, normal approach scoring, a zero-putt eagle, full season win/loss paths, seeded AI, profile isolation, backup merge/resume, all practice selections and daily date/par rules. `npm run build` creates a static site. CI runs those checks. The game is published at https://pinbound.github.io/PinBoundGolf/ through the manually triggered Publish Pinbound workflow; run it after pushing changes to update the live game.
 
 Browser QA used a separate localhost:4181 origin with explicitly generated fixture saves, leaving the normal preview's records untouched. Checks covered final-hole resume, full-course initials posting and reload persistence, event advancement/standings and persistence, daily completion/reopen/practice, arbitrary hole selection, coastal/dune art and 390 × 844 layout. A physical iPhone and human listening tests remain useful for final input/audio tuning. These checks establish functional flows, not that every hole has received a human playtest or competitive balance pass.
 

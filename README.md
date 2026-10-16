@@ -31,7 +31,9 @@ npm test
 npm run build
 ```
 
-The development server prints `http://127.0.0.1:4180`. Static production output is `dist/`, with relative paths supporting project-subpath hosting. GitHub Actions runs tests/builds. A manually triggered Publish Pinbound workflow is prepared for GitHub Pages; public hosting has not been enabled or deployed.
+Play the published game at **[Pinbound](https://pinbound.github.io/PinBoundGolf/)**.
+
+The development server prints `http://127.0.0.1:4180`. Static production output is `dist/`, with relative paths supporting project-subpath hosting. GitHub Actions runs tests/builds. GitHub Pages publishes through the manually triggered Publish Pinbound workflow; run it after pushing changes to update the live game.
 
 ## Controls
 
