@@ -1,0 +1,7 @@
+{
+  "menuMusic": { "src": "main-menu.mp3", "bus": "music", "usage": "Most menus; stop when gameplay begins", "loop": true },
+  "scorecardMusic": { "src": "scorecard.mp3", "bus": "music", "usage": "Final score review", "loop": true },
+  "swing": { "src": "swing-swish.mp3", "bus": "effects", "usage": "Shot swing; adapt by club and swing type", "loop": false },
+  "trophy": { "src": "trophy.mp3", "bus": "effects", "usage": "Leaderboard entry and season championship win", "loop": false },
+  "ballCup": { "src": "ball-cup.mp3", "bus": "effects", "usage": "Ball enters the cup", "loop": false }
+}
