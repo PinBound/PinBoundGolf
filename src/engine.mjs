@@ -64,8 +64,8 @@ export function openingHole(){return{
   bunkers:[{x:31,y:218,rx:12,ry:22,rot:-.35},{x:-44,y:305,rx:12,ry:17,rot:.4},{x:-31,y:400,rx:8,ry:12,rot:-.4},{x:10,y:422,rx:9,ry:7,rot:.3}],
   water:[{x:42,y:136,rx:15,ry:28,rot:-.3}],practice:false,
 };}
-export function generatePractice(seed){
-  const r=randomStream('layout|'+seed),par=[3,4,5][Math.floor(r()*3)],length=par===3?140+r()*65:par===4?325+r()*105:475+r()*75;
+export function generatePractice(seed,parOverride){
+  const r=randomStream('layout|'+seed),drawnPar=[3,4,5][Math.floor(r()*3)],par=[3,4,5].includes(parOverride)?parOverride:drawnPar,length=par===3?140+r()*65:par===4?325+r()*105:475+r()*75;
   const bend=(r()-.5)*75,path=par===3?[{x:0,y:0},{x:bend*.25,y:length}]:[{x:0,y:0},{x:bend,y:length*.52},{x:bend*.4,y:length}];
   const green={...path.at(-1)},gr=12+r()*4,bunkers=[];
   for(let i=0;i<3;i++){const p=pointAlong(path,length*(i===2?.99:.45+r()*.4));bunkers.push({x:p.x+(i%2?1:-1)*(23+r()*9),y:p.y,rx:6+r()*7,ry:8+r()*10,rot:r()*Math.PI});}

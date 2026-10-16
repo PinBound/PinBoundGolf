@@ -2,9 +2,9 @@
 
 A browser golf game featuring eight original courses, arcade leaderboards, a competitive season ending in a championship, daily generated rounds, and unlimited practice.
 
-## Planned course collection
+## Course collection
 
-117 permanent holes across five 18-hole courses and three 9-hole courses. Locations and design inspirations are recorded in [the design brief](docs/DESIGN.md). Course names, artwork and hole layouts will be original.
+117 permanent holes across five 18-hole courses and three 9-hole courses. Original names and fixed layouts draw inspiration from the requested destinations; these are not reproductions of real club routings. See [the full game guide](docs/FULL-GAME.md).
 
 ## Modes
 
@@ -17,7 +17,9 @@ Scores show both total strokes and relative-to-par score; fewer strokes ranks hi
 
 ## Project status
 
-The first playable prototype is implemented: one original Pine Barrens opening hole, seeded random single-hole practice, nine clubs, oscillating aim-lock, timed power, wind, lie effects, rollout, penalties, automatic putting, save/resume, supplied audio and a local ten-place opening-hole leaderboard. The full eight-course collection and season/daily modes are planned, not yet implemented.
+All four modes are playable. The game includes eight complete courses with distinct scenery and difficulty, per-course ten-place arcade records, persistent player profiles, an eight-event season against 23 fictional pros, a date-seeded daily nine, and practice on any of the 117 permanent holes or a generated seed. The tested aim-lock, nine clubs, power timing, chip-ins and automatic putting mechanics are preserved.
+
+Profiles, seasons, records and saves live in this browser. Backup export/import is provided. This release has no accounts, cross-device sync or shared online leaderboard; simulated opponents are not live players. Avatar customization is deferred.
 
 ## Run and verify
 
@@ -29,7 +31,7 @@ npm test
 npm run build
 ```
 
-The development server prints `http://127.0.0.1:4180`. The static production output is `dist/`. Serve that directory with any static host; files use relative paths for project-subpath hosting. GitHub Actions checks tests and builds on pushes and pull requests. Deployment is not configured yet.
+The development server prints `http://127.0.0.1:4180`. Static production output is `dist/`, with relative paths supporting project-subpath hosting. GitHub Actions runs tests/builds. A manually triggered Publish Pinbound workflow is prepared for GitHub Pages; public hosting has not been enabled or deployed.
 
 ## Controls
 
@@ -37,7 +39,7 @@ Tap/click the map to choose an aim center. Lock the oscillating line, then stop 
 
 Shots are saved at strike time and restored by replaying inputs. Local records use three-letter initials; these are device-local and are not server-verified competitive scores. Browser storage/audio failures do not block play. The game requires a server for ES modules; opening `index.html` directly is unsupported.
 
-See [docs/DESIGN.md](docs/DESIGN.md) for confirmed requirements and open design decisions.
+See [the full game guide](docs/FULL-GAME.md) for the course catalog, season rules and implementation details. [The original design brief](docs/DESIGN.md) records the project scope.
 
 Five supplied music/effect files are included under `public/audio/`. See [the audio plan](docs/AUDIO.md) and [event manifest](public/audio/manifest.json) for intended usage.
 

@@ -1,5 +1,7 @@
 # First playable: Pine Barrens / The Needle
 
+Historical prototype snapshot. See [FULL-GAME.md](FULL-GAME.md) for the current eight-course release.
+
 ## Implemented
 
 An original 412-yard par 4 inspired by New Jersey pinelands, with bent fairway, sand hazards, one water hazard, a sloped green and automatic putt rings. The terrain and course art are original procedural Canvas drawing. No competitor source, exported course geometry, branding or artwork is included.

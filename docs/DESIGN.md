@@ -23,11 +23,11 @@ Players choose a permanent course and complete its holes. Each course has a ten-
 
 ## Season play
 
-A persistent player profile competes against fictional professionals through multiple tournaments culminating in a championship at the Pine Valley course. Avatar customization is deferred. Field size, schedule, rounds per tournament, points, qualification and championship format remain undecided. A 24-player field was proposed, but has not been approved as a requirement.
+A persistent player profile competes against 23 fictional professionals in eight single-round events, ending at Pine Barrens. The top 12 qualify for that championship. The implemented defaults and scoring rules are recorded in [FULL-GAME.md](FULL-GAME.md). Avatar customization remains deferred.
 
 ## Daily play
 
-Generate nine holes from a canonical date seed. The same seed and version must reproduce the same course. The underlying system should independently implement the procedural approach studied during research. Rollover timezone, ranked-attempt policy and daily leaderboard rules remain undecided.
+Generate nine holes from a canonical date seed. The same seed and version reproduce the same course. The independent procedural generator uses a shuffled par mix and date-seeded geometry, wind and setting. Rollover is 00:00 UTC. Each local player has one saved daily card, then unlimited practice; no shared online daily leaderboard is connected.
 
 ## Practice
 
@@ -37,14 +37,14 @@ Allow practice on any permanent hole or a newly generated hole. Generate random 
 
 Provide menu music and gameplay sound effects with separate volume controls. Plan original procedural terrain/scenery and original branding. Hero art, distinctive scenery and eventual avatar assets may need custom illustrations. No license to reuse Daily Holes artwork or source has been obtained; keep competitor research downloads and reconstructed layouts outside this repository.
 
-## Decisions needed during prototyping
+## Implemented defaults and remaining scope
 
 - Implemented for the first prototype: oscillating aim-lock, timed power, nine clubs and automatic putting rings. The user's direction is to preserve Daily Holes' mechanics closely while changing the course and mode structure.
-- Course difficulty, optional assists and leaderboard separation.
-- Penalties, drop rules, stroke caps, ties and abandoned rounds.
-- Local saves versus accounts/cloud sync and shared leaderboards.
-- Season field size, tournament calendar and progression rules.
-- Canonical daily rollover and immutable generator/physics versions.
+- Course difficulty comes from geometry, wind and green/ring parameters; all modes retain one shot engine.
+- Water/OB penalties, ten-stroke minimum caps, local arcade ties and save/resume are implemented.
+- Browser-local profiles, rounds, records, careers and backup export/import are implemented. Accounts, cloud sync and shared online rankings remain future work.
+- A 24-player field, eight events and top-12 championship qualification are implemented.
+- Daily rollover uses UTC; content and saved rounds have explicit version identities.
 
 ## Implementation sequence
 
