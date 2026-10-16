@@ -1,8 +1,10 @@
 import {randomStream,strokeCap,scoreLabel} from './engine.mjs';
 import {COURSES,courseHoles,dailyHoles,practiceHole,courseHole,CONTENT_VERSION} from './courses.mjs';
+import {withObstacles,OBSTACLE_RULES} from './obstacles.mjs';
 export const ROUND_VERSION='rounds-1';
 export function roundSlot(s){const player=s.profileId||'guest';return s.mode==='daily'?`daily|${player}|${s.day}`:s.mode==='season'?`season|${player}|${s.seasonId}|${s.eventIndex}`:s.mode==='course'?`course|${player}|${s.courseId}`:`practice|${player}`;}
 export function holesFor(spec){
+  if(spec.rules===OBSTACLE_RULES)return holesFor({...spec,rules:undefined}).map((h,i)=>withObstacles(h,spec.mode==='practice'&&!spec.day?(spec.holeIndex??Math.floor(randomStream('feature|'+spec.seed)()*100)):i));
   if(spec.mode==='daily')return dailyHoles(spec.day);
   if(spec.mode==='practice')return spec.day?dailyHoles(spec.day).map(h=>({...h,practice:true})):spec.courseId?[{...courseHole(spec.courseId,spec.holeIndex),practice:true}]:[practiceHole(spec.seed)];
   if(spec.mode==='course'||spec.mode==='season')return courseHoles(spec.courseId);

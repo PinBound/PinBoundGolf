@@ -21,4 +21,19 @@ The user supplied five MP3 files for Pinbound. Originals were copied without mod
 - Avoid abrupt music restarts on every menu navigation. Stop or suspend appropriate audio when the app is hidden.
 - Resolve asset URLs relative to the app deployment base so GitHub project-path hosting works.
 
-The manifest records intended event mappings; there is no audio player implementation yet. No supplied files have been transcoded or auditioned during repository preparation. Copies were verified against the originals using SHA-256.
+The current player uses HTML audio for the supplied tracks and effects. Music switching stops the previous track; crossfading and reusable decoded effect buffers above remain future polish. Copies were verified against the originals using SHA-256.
+
+## Course ambience
+
+Gameplay now has a separate, saved Course ambience volume control. Original synthesized filtered noise provides a soft breeze, with sparse two-note bird calls. This is temporary sound design pending supplied recordings. It fades out in menus and score review, follows mute, and suspends in hidden tabs. No extra audio files are required for this provisional layer.
+
+Suggested recordings, in priority order:
+
+1. Seamless gentle wind/leaf bed, 45–90 seconds, no voices or music.
+2. Quiet surf bed for Pacific Cypress and Atlantic Dunes, 45–90 seconds.
+3. Three to six isolated birds or distant gull calls, 1–4 seconds each.
+4. Soft insects for garden/woodland holes, 30–60 seconds, without a harsh continuous whine.
+5. Ball contact on turf, sand impact, water splash and cart-path bounce.
+6. A brief soft portal shimmer, gentle draft whoosh and subtle lava bubbling.
+
+Keep animals and feature cues sparse; avoid a constant chorus. Supply ambience and individual effects separately so they can use independent levels and triggers. The current synthesized bed can then be replaced by biome-specific recordings.

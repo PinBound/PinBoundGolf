@@ -1,5 +1,6 @@
 // Original implementation calibrated to the researched timing-golf mechanics.
 // The pure engine has no DOM, network, wall-clock or storage dependencies.
+import {featureAt,crossedZone} from './obstacles.mjs';
 export const VERSION = 'pinbound-0.1';
 export const CLUBS = [
   ['DR','Driver',278,26,1.17,11,2.05,1.32],['3W','3 Wood',243,20,1.07,10.2,2.10,1.38],
@@ -9,7 +10,8 @@ export const CLUBS = [
   ['LW','Lob wedge',63,2,.50,6.3,2.50,1.72],
 ].map(([id,name,carry,roll,disp,fan,sweep,climb])=>({id,name,carry,roll,disp,fan,sweep,climb}));
 export const LIES={tee:{distance:1,error:1,roll:1},fairway:{distance:1,error:1,roll:1},green:{distance:1,error:1,roll:1},rough:{distance:.84,error:1.75,roll:.8},deep:{distance:.62,error:2.45,roll:.6},bunker:{distance:.70,error:1.90,roll:.5}};
-const ROLL={tee:1.25,fairway:1.45,rough:.30,deep:.14,bunker:.07};
+LIES.cart={distance:.92,error:1.55,roll:1};
+const ROLL={tee:1.25,fairway:1.45,rough:.30,deep:.14,bunker:.07,cart:3};
 export const radians=degrees=>degrees*Math.PI/180;
 export const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 export const direction=angle=>({x:Math.sin(angle),y:Math.cos(angle)});
@@ -38,6 +40,8 @@ export function pointAlong(path,at){
 export function inEllipse(p,e){const c=Math.cos(e.rot||0),s=Math.sin(e.rot||0),dx=p.x-e.x,dy=p.y-e.y;return((dx*c+dy*s)/e.rx)**2+((-dx*s+dy*c)/e.ry)**2<=1;}
 export function surfaceAt(h,p){
   if(distance(p,h.green)<=h.greenRadius)return 'green';
+  if(featureAt(h,p,'lava'))return 'lava';
+  if(featureAt(h,p,'cart'))return 'cart';
   if(h.water.some(e=>inEllipse(p,e)))return 'water';
   if(h.bunkers.some(e=>inEllipse(p,e)))return 'bunker';
   const near=pathInfo(p,h.path);
@@ -83,9 +87,14 @@ export function resolveShot(h,ball,lie,clubIndex,aim,power,shotIndex){
   let carry=c.carry*l.distance*factor*(1+tail*.0042);if(lie==='bunker')carry=Math.min(160,carry);
   const near=lie==='tee'?1:Math.min(1,carry/80),error=2.2*l.error*(pure?.72:1),weight=Math.max(2.2*(pure?.72:1)*l.error**.4,error*(.4+.6*near));
   const along=Math.max(-carry*.5,noise()*weight),side=clamp(noise()*weight*(.6+.4*near),-(carry*.3+1.5),carry*.3+1.5)+cross*carry*.0032;
-  const land={x:ball.x+forward.x*(carry+along)+right.x*side,y:ball.y+forward.y*(carry+along)+right.y*side};
+  const land={x:ball.x+forward.x*(carry+along)+right.x*side,y:ball.y+forward.y*(carry+along)+right.y*side},events=[];
+  for(const f of h.features||[])if(f.kind==='gust'&&crossedZone(ball,land,f)){const push=direction(f.angle);land.x+=push.x*f.strength;land.y+=push.y*f.strength;events.push('Wind draft shifted the flight');}
   let budget=Math.max(0,c.roll*l.roll*(.7+factor*.4)*(1+tail*.006)),rest={...land},path=[{...land}],surface=surfaceAt(h,land),holed=false;
-  if(surface!=='water'&&surface!=='ob')for(let i=0;i<300;i++){
+  const used=new Set(),bad=s=>['water','ob','lava'].includes(s);
+  const contact=()=>{for(const f of h.features||[]){if(used.has(f)||!['portal','animal'].includes(f.kind)||distance(rest,f)>f.radius)continue;used.add(f);rest={...(f.kind==='portal'?f.exit:f.den)};path.push({...rest});surface=surfaceAt(h,rest);events.push(f.kind==='portal'?'Portal transported the ball':`${f.species[0].toUpperCase()+f.species.slice(1)} carried the ball to its den`);if(f.kind==='animal')budget=0;}};
+  if(!bad(surface))contact();
+  if(!bad(surface))for(let i=0;i<300&&budget>0;i++){
+    const cart=featureAt(h,rest,'cart');if(cart){const near=pathInfo(rest,cart.path),target=pointAlong(cart.path,near.along+3),d=distance(rest,target);if(d>.01){forward.x=(target.x-rest.x)/d;forward.y=(target.y-rest.y)/d;}if(!events.includes('Cart path accelerated the rollout'))events.push('Cart path accelerated the rollout');}
     const step=1.5,q={x:rest.x+forward.x*step,y:rest.y+forward.y*step},next=surfaceAt(h,q);
     const resistance=next==='green'?.85+1.55*Math.min(1,budget/26)**.75:ROLL[next]||1;
     // Sweep the complete segment: a 1.5 yd rollout step must not jump the cup.
@@ -93,19 +102,19 @@ export function resolveShot(h,ball,lie,clubIndex,aim,power,shotIndex){
     const actualStep=Math.min(step,budget*resistance);
     const end={x:rest.x+forward.x*actualStep,y:rest.y+forward.y*actualStep};
     const endSurface=surfaceAt(h,end);
-    if(endSurface==='water'||endSurface==='ob'){rest=end;surface=endSurface;path.push({...end});break;}
+    if(bad(endSurface)){rest=end;surface=endSurface;path.push({...end});break;}
     budget=Math.max(0,budget-actualStep/resistance);
     if(cupCapture(rest,end,h.pin,budget*resistance)){
       rest={...h.pin};surface='green';holed=true;path.push({...rest});break;
     }
-    rest=end;surface=surfaceAt(h,rest);path.push({...rest});
+    rest=end;surface=surfaceAt(h,rest);path.push({...rest});contact();if(bad(surface))break;
     if(actualStep<step)break;
   }
-  surface=surfaceAt(h,rest);const penalty=surface==='water'||surface==='ob'?1:0,note=surface==='water'?'Water · one penalty stroke':surface==='ob'?'Out of bounds · one penalty stroke':'';
+  surface=surfaceAt(h,rest);const penalty=bad(surface)?1:0,note=surface==='lava'?'Lava · one penalty stroke':surface==='water'?'Water · one penalty stroke':surface==='ob'?'Out of bounds · one penalty stroke':events.join(' · ');
   if(surface==='ob')rest={...ball};
-  if(surface==='water'){
+  if(surface==='water'||surface==='lava'){
     const length=distance(land,ball);let drop={...ball};
-    for(let d=2;d<length;d+=2){const t=Math.min(1,(d+2)/length),q={x:land.x+(ball.x-land.x)*t,y:land.y+(ball.y-land.y)*t},sf=surfaceAt(h,q);if(sf!=='water'&&sf!=='ob'){drop=q;break;}}
+    for(let d=2;d<length;d+=2){const t=Math.min(1,(d+2)/length),q={x:land.x+(ball.x-land.x)*t,y:land.y+(ball.y-land.y)*t},sf=surfaceAt(h,q);if(!bad(sf)){drop=q;break;}}
     rest=drop;
   }
   const restLie=surfaceAt(h,rest);

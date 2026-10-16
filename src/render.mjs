@@ -1,4 +1,5 @@
 import {randomStream,distance,pathInfo,pointAlong,direction,puttRings,LIES,CLUBS} from './engine.mjs';
+import {greenView} from './camera.mjs';
 const TAU=Math.PI*2;
 const PALETTES={
   forest:{ground:'#536e51',grain:['#526c4a','#5f7850','#637c54','#6b8258'],deep:'#74865c',rough:'#94a76d',fairway:['#bad096','#c7dca5'],trees:620},
@@ -13,11 +14,13 @@ const PALETTES={
 export class CourseRenderer{
   constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.camera={x:0,y:200,scale:1};this.cache=document.createElement('canvas');this.cacheKey='';this.width=1;this.height=1;}
   resize(){const rect=this.canvas.getBoundingClientRect();this.width=rect.width;this.height=rect.height;const dpr=Math.min(2,window.devicePixelRatio||1);this.dpr=dpr;this.canvas.width=Math.round(rect.width*dpr);this.canvas.height=Math.round(rect.height*dpr);this.cacheKey='';}
-  fit(h){const xs=h.path.map(p=>p.x),ys=h.path.map(p=>p.y);this.camera={x:(Math.min(...xs)+Math.max(...xs))/2,y:(Math.min(...ys)+Math.max(...ys))/2,scale:Math.min(this.width/(Math.max(...xs)-Math.min(...xs)+180),this.height/(Math.max(...ys)-Math.min(...ys)+110))};}
+  fit(h){this.cameraTarget=null;const xs=h.path.map(p=>p.x),ys=h.path.map(p=>p.y);this.camera={x:(Math.min(...xs)+Math.max(...xs))/2,y:(Math.min(...ys)+Math.max(...ys))/2,scale:Math.min(this.width/(Math.max(...xs)-Math.min(...xs)+180),this.height/(Math.max(...ys)-Math.min(...ys)+110))};}
   screen(p){return{x:this.width/2+(p.x-this.camera.x)*this.camera.scale,y:this.height/2-(p.y-this.camera.y)*this.camera.scale};}
   world(p){return{x:this.camera.x+(p.x-this.width/2)/this.camera.scale,y:this.camera.y-(p.y-this.height/2)/this.camera.scale};}
-  pan(dx,dy){this.camera.x-=dx/this.camera.scale;this.camera.y+=dy/this.camera.scale;}
-  zoom(factor,at){const before=this.world(at);this.camera.scale=Math.min(12,Math.max(.4,this.camera.scale*factor));const after=this.world(at);this.camera.x+=before.x-after.x;this.camera.y+=before.y-after.y;}
+  focusGreen(h,ball,instant=false){const target=greenView(h,ball,this.width,this.height);if(!target)return false;this.cameraTarget=instant?null:target;if(instant)this.camera=target;return true;}
+  advanceCamera(dt){if(!this.cameraTarget)return;const t=1-Math.exp(-dt/150);for(const key of ['x','y','scale'])this.camera[key]+=(this.cameraTarget[key]-this.camera[key])*t;if(Math.abs(this.camera.scale-this.cameraTarget.scale)<.001&&Math.hypot(this.camera.x-this.cameraTarget.x,this.camera.y-this.cameraTarget.y)<.03){this.camera=this.cameraTarget;this.cameraTarget=null;}}
+  pan(dx,dy){this.cameraTarget=null;this.camera.x-=dx/this.camera.scale;this.camera.y+=dy/this.camera.scale;}
+  zoom(factor,at){this.cameraTarget=null;const before=this.world(at);this.camera.scale=Math.min(12,Math.max(.4,this.camera.scale*factor));const after=this.world(at);this.camera.x+=before.x-after.x;this.camera.y+=before.y-after.y;}
   transform(c){c.setTransform(this.dpr,0,0,this.dpr,0,0);c.translate(this.width/2,this.height/2);c.scale(this.camera.scale,-this.camera.scale);c.translate(-this.camera.x,-this.camera.y);}
   scene(h){
     const key=[h.seed,this.width,this.height,this.camera.x,this.camera.y,this.camera.scale].join('|');if(key===this.cacheKey)return;
@@ -48,8 +51,22 @@ export class CourseRenderer{
     // Tiny slope strokes explain that the green has a direction without noise.
     c.strokeStyle='#729452';c.lineWidth=.35;c.globalAlpha=.4;for(let i=0;i<6;i++){const a=i/6*TAU,x=h.green.x+Math.cos(a)*h.greenRadius*.8,y=h.green.y+Math.sin(a)*h.greenRadius*.8;c.beginPath();c.moveTo(x,y);c.lineTo(x+Math.sin(h.slopeDirection)*2,y+Math.cos(h.slopeDirection)*2);c.stroke();}c.globalAlpha=1;
   }
+  drawFeatures(h,now){
+    const c=this.ctx,s=this.camera.scale;
+    const disc=(p,r,color)=>{c.beginPath();c.arc(p.x,p.y,r,0,TAU);c.fillStyle=color;c.fill();};
+    const label=(p,text,color)=>{c.font='bold 9px ui-monospace,monospace';c.textAlign='center';const w=c.measureText(text).width+12;c.fillStyle='#183d32ee';c.fillRect(p.x-w/2,p.y+12,w,16);c.fillStyle=color;c.fillText(text,p.x,p.y+23);};
+    for(const f of h.features||[]){
+      const p=this.screen(f);
+      if(f.kind==='cart'){c.lineJoin='round';c.lineCap='round';c.beginPath();f.path.forEach((q,i)=>{const a=this.screen(q);i?c.lineTo(a.x,a.y):c.moveTo(a.x,a.y);});c.strokeStyle='#4f5148';c.lineWidth=f.width*s+3;c.stroke();c.strokeStyle='#b7b8a3';c.lineWidth=f.width*s;c.stroke();c.strokeStyle='#eddf9b';c.lineWidth=.8;c.setLineDash([4,5]);c.stroke();c.setLineDash([]);continue;}
+      if(f.kind==='lava'){c.save();c.translate(p.x,p.y);c.rotate(-f.rot);c.beginPath();c.ellipse(0,0,f.rx*s,f.ry*s,0,0,TAU);const g=c.createRadialGradient(0,0,0,0,0,f.ry*s);g.addColorStop(0,'#ffca58');g.addColorStop(.65,'#f46b2e');g.addColorStop(1,'#9c3428');c.fillStyle=g;c.fill();c.strokeStyle='#493f35';c.lineWidth=3;c.stroke();c.clip();c.strokeStyle='#ffe290';c.lineWidth=1.3;for(let j=-2;j<=2;j++){c.beginPath();c.moveTo(-f.rx*s,j*7);c.lineTo(0,j*7+4);c.lineTo(f.rx*s,j*7-2);c.stroke();}c.restore();label(p,'LAVA','#ffc173');continue;}
+      if(f.kind==='gust'){c.save();c.translate(p.x,p.y);c.rotate(-f.angle);c.fillStyle='#d2f1e129';c.beginPath();c.ellipse(0,0,f.rx*s,f.ry*s,0,0,TAU);c.fill();c.strokeStyle='#d6fff0';c.lineWidth=1.4;c.setLineDash([4,5]);c.stroke();c.setLineDash([]);for(let j=-1;j<=1;j++){const y=((now/110)%18)-9;c.beginPath();c.moveTo(j*7,y+6);c.lineTo(j*7,y-7);c.lineTo(j*7-3,y-3);c.moveTo(j*7,y-7);c.lineTo(j*7+3,y-3);c.stroke();}c.restore();label(p,'DRAFT','#c9f7ee');continue;}
+      if(f.kind==='portal'){const q=this.screen(f.exit);c.strokeStyle='#c0a6f588';c.setLineDash([2,6]);c.lineWidth=1;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke();c.setLineDash([]);for(const [a,r]of[[p,f.radius],[q,f.exitRadius]]){disc(a,r*s,'#302d59cc');c.strokeStyle='#c7acff';c.lineWidth=2;c.beginPath();c.arc(a.x,a.y,Math.max(4,r*s-2),now/700,now/700+Math.PI*1.65);c.stroke();disc(a,2,'#efe5ff');}label(p,'PORTAL','#d7c3ff');continue;}
+      if(f.kind==='animal'){c.strokeStyle='#ffe7ab99';c.lineWidth=1;c.setLineDash([2,4]);c.beginPath();c.arc(p.x,p.y,f.radius*s,0,TAU);c.stroke();c.setLineDash([]);const q=this.screen(f.den);disc(q,Math.max(3,2*s),'#423a2d');c.save();c.translate(p.x,p.y);c.scale(Math.max(.8,Math.min(1.8,s)),Math.max(.8,Math.min(1.8,s)));if(f.species==='gator'){c.fillStyle='#3c6243';c.beginPath();c.ellipse(0,0,7,3,0,0,TAU);c.fill();c.beginPath();c.moveTo(5,-2);c.lineTo(12,0);c.lineTo(5,2);c.fill();c.strokeStyle='#30503b';c.lineWidth=2;c.beginPath();c.moveTo(-6,0);c.lineTo(-11,3);c.stroke();disc({x:5,y:-1},.8,'#ffeab6');}else if(f.species==='gull'){c.strokeStyle='#fff7df';c.lineWidth=2;c.beginPath();c.moveTo(-9,-2);c.quadraticCurveTo(-4,-7,0,0);c.quadraticCurveTo(5,-7,10,-2);c.stroke();disc({x:0,y:0},2,'#fff7df');}else{disc({x:-4,y:-3},4.5,'#9f734b');disc({x:0,y:1},4,'#bb8b59');disc({x:4,y:-2},2.8,'#d2a878');disc({x:3,y:-5},1.5,'#bb8b59');disc({x:5,y:-3},.65,'#263d31');}c.restore();label(p,f.species.toUpperCase(),'#ffe2a7');}
+    }
+  }
   draw(h,state,ui,now){
     this.scene(h);const c=this.ctx;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,this.canvas.width,this.canvas.height);c.drawImage(this.cache,0,0);c.setTransform(this.dpr,0,0,this.dpr,0,0);
+    this.drawFeatures(h,now);
     // Yardage labels are screen-upright, independent of world transforms.
     c.font='10px ui-monospace, monospace';c.textAlign='center';for(const at of [100,200,300,400]){if(at>h.yards-25)continue;const p=pointAlong(h.path,at),s=this.screen({x:p.x+h.rough+7,y:p.y});c.fillStyle='rgba(242,240,215,.65)';c.fillText(String(at),s.x,s.y);}
     const pin=this.screen(h.pin);c.strokeStyle='#f8f4df';c.lineWidth=1.8;c.beginPath();c.moveTo(pin.x,pin.y);c.lineTo(pin.x,pin.y-23);c.stroke();c.fillStyle='#bf7856';c.beginPath();c.moveTo(pin.x+1,pin.y-23);c.lineTo(pin.x+14,pin.y-18);c.lineTo(pin.x+1,pin.y-14);c.closePath();c.fill();c.fillStyle='#294734';c.beginPath();c.ellipse(pin.x,pin.y+1,3,1.5,0,0,TAU);c.fill();
