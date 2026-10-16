@@ -24,3 +24,5 @@ The first implementation milestone is one polished playable hole and the core sh
 See [docs/DESIGN.md](docs/DESIGN.md) for confirmed requirements and open design decisions.
 
 Five supplied music/effect files are included under `public/audio/`. See [the audio plan](docs/AUDIO.md) and [event manifest](public/audio/manifest.json) for intended usage.
+
+Logo avatars, iOS Home Screen icons and web app icons are available under `public/branding/`, `public/icons/` and `public/apple-touch-icon.png`. See [the brand asset guide](docs/BRAND.md) for exports and app-shell integration.
