@@ -87,11 +87,11 @@ export function resolveShot(h,ball,lie,clubIndex,aim,power,shotIndex){
   let carry=c.carry*l.distance*factor*(1+tail*.0042);if(lie==='bunker')carry=Math.min(160,carry);
   const near=lie==='tee'?1:Math.min(1,carry/80),error=2.2*l.error*(pure?.72:1),weight=Math.max(2.2*(pure?.72:1)*l.error**.4,error*(.4+.6*near));
   const along=Math.max(-carry*.5,noise()*weight),side=clamp(noise()*weight*(.6+.4*near),-(carry*.3+1.5),carry*.3+1.5)+cross*carry*.0032;
-  const land={x:ball.x+forward.x*(carry+along)+right.x*side,y:ball.y+forward.y*(carry+along)+right.y*side},events=[];
+  const land={x:ball.x+forward.x*(carry+along)+right.x*side,y:ball.y+forward.y*(carry+along)+right.y*side},events=[],interactions=[];
   for(const f of h.features||[])if(f.kind==='gust'&&crossedZone(ball,land,f)){const push=direction(f.angle);land.x+=push.x*f.strength;land.y+=push.y*f.strength;events.push('Wind draft shifted the flight');}
   let budget=Math.max(0,c.roll*l.roll*(.7+factor*.4)*(1+tail*.006)),rest={...land},path=[{...land}],surface=surfaceAt(h,land),holed=false;
   const used=new Set(),bad=s=>['water','ob','lava'].includes(s);
-  const contact=()=>{for(const f of h.features||[]){if(used.has(f)||!['portal','animal'].includes(f.kind)||distance(rest,f)>f.radius)continue;used.add(f);rest={...(f.kind==='portal'?f.exit:f.den)};path.push({...rest});surface=surfaceAt(h,rest);events.push(f.kind==='portal'?'Portal transported the ball':`${f.species[0].toUpperCase()+f.species.slice(1)} carried the ball to its den`);if(f.kind==='animal')budget=0;}};
+  const contact=()=>{for(const f of h.features||[]){if(used.has(f)||!['portal','animal'].includes(f.kind)||distance(rest,f)>f.radius)continue;used.add(f);interactions.push({kind:f.kind,...(f.kind==='animal'?{species:f.species}:{}),at:path.length-1});rest={...(f.kind==='portal'?f.exit:f.den)};path.push({...rest});surface=surfaceAt(h,rest);events.push(f.kind==='portal'?'Portal transported the ball':`${f.species[0].toUpperCase()+f.species.slice(1)} carried the ball to its den`);if(f.kind==='animal')budget=0;}};
   if(!bad(surface))contact();
   if(!bad(surface))for(let i=0;i<300&&budget>0;i++){
     const cart=featureAt(h,rest,'cart');if(cart){const near=pathInfo(rest,cart.path),target=pointAlong(cart.path,near.along+3),d=distance(rest,target);if(d>.01){forward.x=(target.x-rest.x)/d;forward.y=(target.y-rest.y)/d;}if(!events.includes('Cart path accelerated the rollout'))events.push('Cart path accelerated the rollout');}
@@ -118,7 +118,7 @@ export function resolveShot(h,ball,lie,clubIndex,aim,power,shotIndex){
     rest=drop;
   }
   const restLie=surfaceAt(h,rest);
-  return{from:{...ball},land:quantize(land),rest:quantize(rest),path,lie:penalty&&restLie==='ob'?lie:restLie,penalty,note,holed:!penalty&&(holed||distance(rest,h.pin)<.36),pure,quality:over>.005?'Overswing':pure?'Pure strike':power>=.72?'Solid strike':'Controlled',carry:distance(ball,land),travel:distance(ball,rest)};
+  return{from:{...ball},land:quantize(land),rest:quantize(rest),path,interactions,lie:penalty&&restLie==='ob'?lie:restLie,penalty,note,holed:!penalty&&(holed||distance(rest,h.pin)<.36),pure,quality:over>.005?'Overswing':pure?'Pure strike':power>=.72?'Solid strike':'Controlled',carry:distance(ball,land),travel:distance(ball,rest)};
 }
 export function applyShot(state,input){
   if(state.complete)throw new Error('Hole already complete');

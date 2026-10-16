@@ -33,8 +33,8 @@ Suggested recordings, in priority order:
 2. Quiet surf bed for Pacific Cypress and Atlantic Dunes, 45–90 seconds.
 3. Three to six isolated birds or distant gull calls, 1–4 seconds each.
 4. Soft insects for garden/woodland holes, 30–60 seconds, without a harsh continuous whine.
-5. Ball contact on turf, sand impact, water splash and cart-path bounce.
-6. A brief soft portal shimmer, gentle draft whoosh and subtle lava bubbling.
+5. Ball contact on turf, water splash and cart-path bounce.
+6. A brief soft portal shimmer and subtle lava bubbling.
 
 Keep animals and feature cues sparse; avoid a constant chorus. Supply ambience and individual effects separately so they can use independent levels and triggers. The supplied recordings now provide the main ambient beds. The remaining optional effects can be added as separate clips.
 
@@ -54,3 +54,9 @@ All six new files were copied unchanged and verified against their Downloads ori
 The final putt starts its combined recording once, and its visual phase lasts the clip duration. It does not stack the old ball-cup sound. A direct chip-in still uses ball-cup. Earlier automatic putts get only a subdued contact sound. The previous swing-swish file is retained as a source asset but no longer triggered. Menu and scorecard tracks are unchanged.
 
 Validation includes recorded layer selection, reuse, mute/levels, hidden-tab suspension/resume, final-putt clip selection and cancellation of delayed strike contact. The developer server now includes Content-Length so long MP3 recordings report finite durations during local testing.
+
+## Portal and wildlife cues
+
+`portal_phase.mp3`, `squirrel_squeak.mp3` and `gator_growl.mp3` are copied unchanged to `public/audio/portal-phase.mp3`, `squirrel-squeak.mp3` and `gator-growl.mp3`. They play once when the ball visibly reaches the relevant interaction during rollout, using the Game effects slider at a subdued relative level. Merely having an animal or portal on the hole does not trigger a cue. Contact events are deterministic and do not change scoring or saved shot proofs.
+
+Per the user's direction, no dedicated draft whoosh or sand effect is added. Gull encounters remain silent because no gull cue was supplied. These cues are individual effects, never ambient loops.

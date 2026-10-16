@@ -26,5 +26,6 @@ export class Sound{
   effect(name,rate=1,gain=1){if(!this.unlocked||this.prefs.muted||!this.prefs.effects||this.hidden)return;const audio=new Audio(asset(name));audio.volume=this.prefs.effects*gain;audio.playbackRate=rate;audio.preservesPitch=false;this.effects.set(audio,gain);const clear=()=>this.effects.delete(audio);audio.onended=clear;audio.onerror=clear;audio.play().catch(clear);return audio;}
   swing(rate=1){this.effect('swing-whoosh',rate,.7);if(!this.unlocked||this.hidden||this.prefs.muted||!this.prefs.effects)return;const timer=setTimeout(()=>{this.pending.delete(timer);this.effect('swing-contact',rate);},120/rate);this.pending.add(timer);}
   putt(final=false){return final?this.effect('putt-and-score'):this.effect('swing-contact',1.35,.35);}
+  interaction(event){const name=event.kind==='portal'?'portal-phase':event.kind==='animal'?{squirrel:'squirrel-squeak',gator:'gator-growl'}[event.species]:null;if(name)return this.effect(name,1,.65);}
   suspend(hidden){this.hidden=hidden;if(hidden){this.cancelPending();this.track?.pause();for(const {audio}of this.ambientLayers.values())audio.pause();for(const e of this.effects.keys())e.pause();this.effects.clear();}else if(this.unlocked){if(this.ambientTheme)for(const {audio}of this.ambientLayers.values())this.play(audio);if(this.track)this.play(this.track);}}
 }
