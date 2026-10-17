@@ -6,6 +6,8 @@ A browser golf game featuring eight original courses, arcade leaderboards, a com
 
 117 permanent holes across five 18-hole courses and three 9-hole courses. Original names and fixed layouts draw inspiration from the requested destinations; these are not reproductions of real club routings. See [the full game guide](docs/FULL-GAME.md).
 
+The course redesign adds nine routing families, reference par sequences, edge-following cart paths, full-width directional drafts, organic hazards and original animal illustrations. The Daily Nine always has two par-5s. See [design notes and scorecard sources](docs/COURSE-DESIGN.md).
+
 ## Modes
 
 - **Course play:** select a course, complete a round, and enter three initials on its ten-place arcade leaderboard.

@@ -4,16 +4,16 @@
 
 | Course | Location | Holes | Par | Difficulty |
 | --- | --- | ---: | ---: | --- |
-| Pine Barrens | Pine Valley, NJ | 18 | 72 | Championship |
+| Pine Barrens | Pine Valley, NJ | 18 | 70 | Championship |
 | Magnolia Grove | Augusta, GA | 18 | 72 | Strategic |
 | Pacific Cypress | Pebble Beach, CA | 18 | 72 | Championship |
-| Windward Heath | Southampton, NY | 18 | 72 | Demanding |
-| Iron Ridge | Oakmont, PA | 18 | 72 | Expert |
+| Windward Heath | Southampton, NY | 18 | 70 | Demanding |
+| Iron Ridge | Oakmont, PA | 18 | 71 | Expert |
 | Atlantic Dunes | Juno Beach, FL | 9 | 36 | Welcoming |
-| Crystal Bluff | Frankfort, MI | 9 | 36 | Strategic |
+| Crystal Bluff | Frankfort, MI | 9 | 35 | Strategic |
 | Scioto Gardens | Dublin, OH | 9 | 36 | Welcoming |
 
-Each hole has an authored name, par, length and routing brief, with stable seeded detailing for hazards, pins and wind. These are original, permanent parameterized layouts, not real-world club replicas or competitor exports. Content is versioned as `courses-1`. Course art is procedural: forest, garden, coastal, heath, parkland, dunes, bluffs and woodland palettes have different canopy density and decorative treatments. Course difficulty changes corridor widths, green size, slope/ring tightness and wind, while retaining one common shot engine.
+Each hole has an authored name, par, length and routing brief, with stable seeded detailing for hazards, pins and wind. These are original, permanent parameterized layouts, not real-world club replicas or competitor exports. Current redesigned layouts use `courses-2` rules, while previous layouts remain replayable. See [routing, hazard and scorecard details](COURSE-DESIGN.md). Course art is procedural: forest, garden, coastal, heath, parkland, dunes, bluffs and woodland palettes have different canopy density and decorative treatments. Course difficulty changes corridor widths, green size, slope/ring tightness and wind, while retaining one common shot engine.
 
 ## Course play
 
@@ -49,7 +49,7 @@ Click/tap to aim; lock the oscillating line; time the power meter. Choose among 
 
 ## Validation
 
-`npm test` currently passes 28 tests, including all 117 complete cap-score proof replays, normal approach scoring, a zero-putt eagle, full season win/loss paths, seeded AI, profile isolation, backup merge/resume, all practice selections and daily date/par rules. `npm run build` creates a static site. CI runs those checks. The game is published at https://pinbound.github.io/PinBoundGolf/ through the manually triggered Publish Pinbound workflow; run it after pushing changes to update the live game.
+`npm test` currently passes 50 tests, including all 117 complete cap-score proof replays, normal approach scoring, a zero-putt eagle, full season win/loss paths, seeded AI, profile isolation, backup merge/resume, all practice selections and daily date/par rules. `npm run build` creates a static site. CI runs those checks. The game is published at https://pinbound.github.io/PinBoundGolf/ through the manually triggered Publish Pinbound workflow; run it after pushing changes to update the live game.
 
 Browser QA used a separate localhost:4181 origin with explicitly generated fixture saves, leaving the normal preview's records untouched. Checks covered final-hole resume, full-course initials posting and reload persistence, event advancement/standings and persistence, daily completion/reopen/practice, arbitrary hole selection, coastal/dune art and 390 × 844 layout. A physical iPhone and human listening tests remain useful for final input/audio tuning. These checks establish functional flows, not that every hole has received a human playtest or competitive balance pass.
 

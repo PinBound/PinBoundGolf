@@ -1,6 +1,6 @@
 // Original implementation calibrated to the researched timing-golf mechanics.
 // The pure engine has no DOM, network, wall-clock or storage dependencies.
-import {featureAt,crossedZone} from './obstacles.mjs';
+import {featureAt,crossedZone,containsHazard} from './obstacles.mjs';
 export const VERSION = 'pinbound-0.1';
 export const CLUBS = [
   ['DR','Driver',278,26,1.17,11,2.05,1.32],['3W','3 Wood',243,20,1.07,10.2,2.10,1.38],
@@ -42,8 +42,9 @@ export function surfaceAt(h,p){
   if(distance(p,h.green)<=h.greenRadius)return 'green';
   if(featureAt(h,p,'lava'))return 'lava';
   if(featureAt(h,p,'cart'))return 'cart';
-  if(h.water.some(e=>inEllipse(p,e)))return 'water';
-  if(h.bunkers.some(e=>inEllipse(p,e)))return 'bunker';
+  if(h.water.some(e=>containsHazard(p,e)))return 'water';
+  if(h.bunkers.some(e=>containsHazard(p,e)))return 'bunker';
+  if(h.fairwayIsland&&containsHazard(p,h.fairwayIsland))return 'rough';
   const near=pathInfo(p,h.path);
   if(p.y< -9||near.along>near.total-1&&distance(p,h.green)>h.deep)return 'ob';
   if(near.distance<=h.fairway)return near.along<9?'tee':'fairway';

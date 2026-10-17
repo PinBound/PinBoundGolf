@@ -1,4 +1,5 @@
 import {randomStream,pointAlong,pathInfo,distance,inEllipse} from './engine.mjs';
+import {polygonContains} from './landforms.mjs';
 export const OBSTACLE_RULES='hazards-1';
 export const FEATURE_NAMES={animal:'Wildlife',lava:'Lava',cart:'Cart path',gust:'Wind draft',portal:'Portal'};
 // Separate seed stream: adding obstacles never rerolls the original terrain.
@@ -18,5 +19,6 @@ export function withObstacles(h,index=0){
   });
   return{...h,features,rules:OBSTACLE_RULES};
 }
-export function featureAt(h,p,kind){return(h.features||[]).find(f=>f.kind===kind&&(kind==='cart'?pathInfo(p,f.path).distance<=f.width/2:kind==='lava'||kind==='gust'?inEllipse(p,f):distance(p,f)<=f.radius));}
-export function crossedZone(a,b,f){const steps=Math.max(1,Math.ceil(distance(a,b)/3));for(let i=0;i<=steps;i++){const t=i/steps;if(inEllipse({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t},f))return true;}return false;}
+export const containsHazard=(p,f)=>f.points?polygonContains(p,f.points):inEllipse(p,f);
+export function featureAt(h,p,kind){return(h.features||[]).find(f=>f.kind===kind&&(kind==='cart'?pathInfo(p,f.path).distance<=f.width/2:kind==='lava'||kind==='gust'?containsHazard(p,f):distance(p,f)<=f.radius));}
+export function crossedZone(a,b,f){const steps=Math.max(1,Math.ceil(distance(a,b)/3));for(let i=0;i<=steps;i++){const t=i/steps;if(containsHazard({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t},f))return true;}return false;}
